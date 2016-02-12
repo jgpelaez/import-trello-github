@@ -2,3 +2,9 @@
 *.json
 
 state/
+/trello/
+/docker-run-skyscrapers.sh
+/docker-run-skyscrapers-projects.sh
+/export/
+/.project
+/.pydevproject

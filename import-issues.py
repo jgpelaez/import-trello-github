@@ -6,6 +6,7 @@ import sys
 
 import py.path
 import requests
+import re
 
 LOG_LEVELS = {logging.getLevelName(level): level for level in (
     logging.DEBUG,
@@ -139,6 +140,8 @@ class LabelsMapper(object):
             self._apply_mappings_for(ret, card_list_name, 'lists')
 
         except KeyError:
+            logging.warning("Keyerror  ")
+            logging.warning(KeyError)
             pass
 
         if card_data['labels']:
@@ -148,20 +151,44 @@ class LabelsMapper(object):
         return ret
 
     def _apply_mappings_for(self, ret, value, map_from_type):
+        logging.debug("map_from_type " + map_from_type + " value " + value)
         from_type_mappings = self.labelmaps.get(map_from_type, {})
         for map_to_type in ('label', 'milestone', 'state'):
             try:
                 mappings = from_type_mappings[value]
+                #if mappings:
                 dict_merge_arrays(ret, self._arg_for_mapping(
                     map_to_type, mappings[map_to_type]
                 ))
                 break
 
             except KeyError:
+                mappings = self._get_mappings_with_expr_for(value, from_type_mappings)
+                if mappings:
+                    try:
+                        dict_merge_arrays(ret, self._arg_for_mapping(
+                            map_to_type, mappings[map_to_type]
+                        ))
+                        logging.debug(ret)
+                        #break
+                    except KeyError:
+                        pass
                 pass
 
         else:
             dict_merge_arrays(ret, {'labels': [value]})
+
+    def _get_mappings_with_expr_for(self, value, from_type_mappings):
+        for mappingKey in from_type_mappings:
+#            logging.debug("KEY: " + mappingKey)
+            p = re.compile(mappingKey)
+            if p.match(value):
+                logging.debug("match: " + mappingKey + " " + value) 
+                return from_type_mappings[mappingKey]
+#            else:
+#                logging.debug("no match: " + mappingKey + " " + value)
+        return None
+
 
     def _arg_for_mapping(self, map_type, name):
         if map_type == 'label':
@@ -213,9 +240,13 @@ class Card(object):
             state = {}
 
         state['title'] = self.card_data['name']
-        state['body'] = "%s\n\n%s" % (
-            self.card_data['url'],
-            self.card_data['desc']
+
+# archived trello cards
+        if self.card_data['closed'] == 'true':
+            state['state'] = 'closed'
+        state['body'] = "%s\n\n[imported from:%s]" % (
+            self.card_data['desc'],
+            self.card_data['url']
         )
 
         state = dict(
