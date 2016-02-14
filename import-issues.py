@@ -151,7 +151,7 @@ class LabelsMapper(object):
         return ret
 
     def _apply_mappings_for(self, ret, value, map_from_type):
-        logging.debug("map_from_type " + map_from_type + " value " + value)
+        #logging.debug("map_from_type " + map_from_type + " value " + value)
         from_type_mappings = self.labelmaps.get(map_from_type, {})
         for map_to_type in ('label', 'milestone', 'state'):
             try:
@@ -169,7 +169,7 @@ class LabelsMapper(object):
                         dict_merge_arrays(ret, self._arg_for_mapping(
                             map_to_type, mappings[map_to_type]
                         ))
-                        logging.debug(ret)
+                        #logging.debug(ret)
                         #break
                     except KeyError:
                         pass
@@ -242,7 +242,8 @@ class Card(object):
         state['title'] = self.card_data['name']
 
 # archived trello cards
-        if self.card_data['closed'] == 'true':
+        logging.debug("self.card_data['closed']" + str(self.card_data['closed']))
+        if self.card_data['closed'] == True:
             state['state'] = 'closed'
         state['body'] = "%s\n\n[imported from:%s]" % (
             self.card_data['desc'],
@@ -253,6 +254,7 @@ class Card(object):
             list(state.items()) +
             list(self.labels_mapper.args_for(self.card_data).items())
         )
+        logging.debug(state)
 
         req = gh_request(
             req_url, self.args, data=state, req_fn=req_fn,
