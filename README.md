@@ -51,3 +51,13 @@ For the Trello board at https://trello.com/b/zaFPjsli/dockci
                    trello.json rickycook dockci \
                    my@email.com mypasswordhere
 ```
+
+## Docker execution
+
+Using the Dockerfile is not needed to install python in local, it will install the python requirements.
+
+```
+sh ./docker-run.sh mappings.json \
+                   trello.json rickycook dockci \
+                   my@email.com mypasswordhere
+```
