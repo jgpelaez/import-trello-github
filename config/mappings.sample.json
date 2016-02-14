@@ -1,0 +1,13 @@
+{
+    "labels": {
+        "Really Hard": {"label": "8 points"}
+    },
+    "lists": {
+        "Done": { "state": "closed" },
+    	"Done.*": { "state": "closed" },
+        "Doing": { "label": ["in progress", "now"] },
+        "Next Up": { "milestone": "alpha 4",
+                     "label": "some label" },
+        "Beta icebox": { "milestone": "beta" }
+    }
+}
